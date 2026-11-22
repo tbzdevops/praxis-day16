@@ -1,22 +1,5 @@
 # Tag 16 Praxis – DORA-Metriken
 
-## P1: Streitfälle
-
-<!--
-Entscheidet in der Gruppe jeden Fall mit «ja» oder «nein» und begründet die
-Entscheidung in mindestens einem ganzen Satz. Es gibt nicht immer eine einzige
-richtige Antwort, wichtig ist eine Begründung, die sich auf die Definitionen
-aus der Theorie stützt. Jede Person überträgt das Ergebnis in ihr Repository.
--->
-
-| Nr | Fall | Ja/Nein | Begründung |
-|----|------|---------|------------|
-| 1 | Ein Deployment wird nach drei Minuten automatisch zurückgerollt, keine Kundin hat etwas bemerkt. Ist es ein **fehlgeschlagenes Deployment**? | | |
-| 2 | Das Team schaltet ein Feature Flag um, ohne neuen Code auszuliefern. Ist das ein **Deployment**? | | |
-| 3 | Ein Deployment geht auf die Staging-Umgebung. Zählt es für die **Deployment Frequency**? | | |
-| 4 | Ein Ausfall bei AWS legt den Shop zwei Stunden lahm. Zählt das für die **Change Failure Rate**? | | |
-| 5 | Beginnt die **Lead Time** beim ersten Commit und nicht erst beim Merge des Pull Requests? | | |
-
 ## P3 (für Schnelle): Zwei Teams im Vergleich
 
 <!--

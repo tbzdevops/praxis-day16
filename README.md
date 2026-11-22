@@ -3,38 +3,47 @@
 > **Praxisauftrag.** Dieses Repository ist dein Arbeitsplatz für die Praxis
 > von Tag 16. Es enthält den Rechenkern `dora.py` mit Lücken, die Tests
 > `test_dora.py`, zwei Deployment-Protokolle in `data/` und die Vorlage
-> `DOKUMENTATION.md` für deine Ergebnisse.
+> `DOKUMENTATION.md` für den Vergleich in P3.
 
 ## Ausgangslage
 
-Im Spiel habt ihr erlebt, wie kleine Batches und frühe Investitionen in Tests
-und Automatisierung Tempo **und** Stabilität verbessern. Jetzt macht ihr das
-messbar: Zuerst klärt ihr in der Gruppe, was überhaupt gezählt wird. Dann
-schreibt jede Person einen kleinen Rechenkern, der aus einem
-Deployment-Protokoll alle fünf DORA-Metriken berechnet. Denselben Rechenkern
-setzt ihr anschliessend im Projekt auf die echten Daten eurer TechStyle-Pipeline
-an.
+In Theorie 1 habt ihr die fünf DORA-Metriken und ihre Definitionen
+kennengelernt. Jetzt macht ihr sie messbar: Zuerst klärt ihr in der Gruppe auf
+dem Nimbus-Board, was überhaupt gezählt wird. Dann schreibt jede Person einen
+kleinen Rechenkern, der aus einem Deployment-Protokoll alle fünf DORA-Metriken
+berechnet. Denselben Rechenkern setzt ihr nach dem Spiel «Release Rush» im
+Projekt auf die echten Daten eurer TechStyle-Pipeline an.
 
 Die vollständige Anleitung steht in der Tagesplanung von Tag 16, Abschnitt
 **Praxis**.
 
 ## Aufgaben
 
-| Phase | Auftrag | Zeit | Format | Ergebnis |
-|-------|---------|------|--------|----------|
-| Praxis | **P1** Streitfälle entscheiden | 10 Min | Gruppen à 3–4 | Tabelle in `DOKUMENTATION.md` |
-| Praxis | **P2** Rechenkern `dora.py` | 25 Min | Einzelarbeit | `dora.py`, alle Tests grün |
-| für Schnelle | **P3** Zwei Teams vergleichen | – | Einzelarbeit | Vergleich in `DOKUMENTATION.md` |
+**Zeit:** 45 Min inklusive 10 Min Pause, die Gruppe legt die Pause selbst |
+**Format:** Gruppen à 3–4 mit einem Nimbus-Board pro Gruppe
 
-Öffne dieses Repository in einem **GitHub Codespace**: **Code** →
-**Codespaces** → **Create codespace on main**. Python ist dort bereits
-installiert, `dora.py` braucht nur die Standardbibliothek.
+| Auftrag | Zeit | Format | Ergebnis |
+|---------|------|--------|----------|
+| **P0** Setup | – | jede Person | Repository im Codespace, Nimbus-Board der Gruppe offen |
+| **P1** Streitfälle entscheiden | 10 Min | Gruppe | Entscheid und Begründung auf dem Nimbus-Board |
+| **P2** Rechenkern `dora.py` | 25 Min | jede Person im eigenen Repository, die Gruppe hilft sich | `dora.py`, alle Tests grün |
+| **P3** Zwei Teams vergleichen (für Schnelle) | – | jede Person | Vergleich in `DOKUMENTATION.md` |
 
-### P1 — Streitfälle (Gruppe)
+### P0 — Setup
 
-Entscheidet die fünf Fälle in `DOKUMENTATION.md` mit **Ja** oder **Nein** und
-begründet jede Entscheidung in einem Satz. Stützt euch auf die Definitionen aus
-der Theorie. Jede Person überträgt das Ergebnis in ihr eigenes Repository.
+1. Classroom-Auftrag annehmen (erledigt, wenn du dieses README liest).
+2. Repository in einem **GitHub Codespace** öffnen: **Code** →
+   **Codespaces** → **Create codespace on main**. Python ist dort bereits
+   installiert, `dora.py` braucht nur die Standardbibliothek.
+3. Das Nimbus-Board eurer Gruppe öffnen.
+
+### P1 — Streitfälle (Gruppe, Nimbus-Board)
+
+Auf dem Board liegen fünf Karten mit Streitfällen: Was zählt als Deployment,
+als Fehler, als Lead Time? Lest jeden Fall, entscheidet mit **Ja** oder
+**Nein** und begründet jede Entscheidung in einer Zeile auf dem Board. Stützt
+euch auf die Definitionen aus Theorie 1. Das Board bleibt stehen: Im Projekt
+nutzt ihr die Entscheidungen für die Definitionen in `DORA.md`.
 
 ### P2 — Rechenkern `dora.py`
 
@@ -46,7 +55,7 @@ der Theorie. Jede Person überträgt das Ergebnis in ihr eigenes Repository.
 3. Teste nach jeder Funktion:
 
    ```bash
-   python -m unittest -v test_dora.TestDeploymentFrequency
+   python -m unittest -v test_dora.TestLeadTime
    python -m unittest -v          # alle Tests
    ```
 
@@ -58,8 +67,8 @@ der Theorie. Jede Person überträgt das Ergebnis in ihr eigenes Repository.
    python dora.py data/team-kasse.csv --tage 28
    ```
 
-Habt ihr das Spielprotokoll aus Nimbus exportiert, rechnet ihr es mit demselben
-Befehl durch: Es hat dasselbe Format.
+Nach dem Spiel «Release Rush» könnt ihr das exportierte Spielprotokoll aus
+Nimbus mit demselben Befehl durchrechnen: Es hat dasselbe Format.
 
 ### P3 — Zwei Teams vergleichen (für Schnelle)
 
@@ -75,11 +84,9 @@ sobald eine Änderung es wieder bricht, verschwindet der Haken. Du musst hier
 nichts von Hand pflegen, beim nächsten Push wird die Liste überschrieben.
 
 <!-- c50:progress -->
-**Fortschritt: 0 / 9 Kriterien erfüllt** ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜
+**Fortschritt: 0 / 7 Kriterien erfüllt** ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜
 <!-- /c50:progress -->
 
-- [ ] ⬜ P1: Alle fünf Streitfälle mit Ja oder Nein entschieden
-- [ ] ⬜ P1: Jede Entscheidung ist begründet (mindestens fünf Wörter)
 - [ ] ⬜ P2: Deployment Frequency korrekt berechnet
 - [ ] ⬜ P2: Lead Time for Changes korrekt berechnet (Median in Stunden)
 - [ ] ⬜ P2: Change Failure Rate korrekt berechnet
@@ -90,6 +97,7 @@ nichts von Hand pflegen, beim nächsten Push wird die Liste überschrieben.
 
 Zusätzlich, nicht bewertet:
 
+- P1 bespricht die Lehrperson in Theorie 2 direkt auf den Nimbus-Boards.
 - P3 (für Schnelle): Die Prüfung zeigt ⭐, sobald die Vergleichstabelle für
   beide Teams ausgefüllt ist.
 
@@ -119,7 +127,7 @@ erfüllten Kriterien oben im README ab. Ergebnis im Tab
 **Actions** → letzter Run → Job *Abnahmekriterien prüfen*.
 
 Die Punktzahl ist **anteilig**: Jedes erfüllte Abnahmekriterium zählt einen
-Punkt (z. B. `Points 5/9`). Grün wird der Lauf erst, wenn alle Kriterien
+Punkt (z. B. `Points 5/7`). Grün wird der Lauf erst, wenn alle Kriterien
 erfüllt sind, Teilpunkte gibt es aber ab dem ersten.
 
 ## Musterlösung
