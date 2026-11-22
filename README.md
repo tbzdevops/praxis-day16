@@ -1,18 +1,18 @@
 # Tag 16 Praxis — DORA-Metriken
 
 > **Praxisauftrag.** Dieses Repository ist dein Arbeitsplatz für die Praxis
-> von Tag 16. Es enthält den Rechenkern `dora.py` mit Lücken, die Tests
-> `test_dora.py`, zwei Deployment-Protokolle in `data/` und die Vorlage
-> `DOKUMENTATION.md` für den Vergleich in P3.
+> von Tag 16. Es enthält das fertige Werkzeug `dora.py`, vier
+> Deployment-Protokolle in `data/` und die Vorlage `DOKUMENTATION.md`.
 
 ## Ausgangslage
 
 In Theorie 1 habt ihr die fünf DORA-Metriken und ihre Definitionen
-kennengelernt. Jetzt macht ihr sie messbar: Zuerst klärt ihr in der Gruppe auf
-dem Nimbus-Board, was überhaupt gezählt wird. Dann schreibt jede Person einen
-kleinen Rechenkern, der aus einem Deployment-Protokoll alle fünf DORA-Metriken
-berechnet. Denselben Rechenkern setzt ihr nach dem Spiel «Release Rush» im
-Projekt auf die echten Daten eurer TechStyle-Pipeline an.
+kennengelernt, im Spiel «Release Rush» habt ihr sie erlebt. Jetzt messt ihr
+selbst. Programmieren müsst ihr dafür nicht: `dora.py` ist ein fertiges
+Werkzeug, so wie ein Dashboard im Betrieb. Die Arbeit eines Cloud Engineers
+liegt davor und danach: festlegen, was zählt, die Rohdaten aus der Pipeline
+aufbereiten, das Ergebnis nachprüfen und einordnen. Dasselbe Werkzeug setzt
+ihr im Projekt auf die echten Daten eurer TechStyle-Pipeline an.
 
 Die vollständige Anleitung steht in der Tagesplanung von Tag 16, Abschnitt
 **Praxis**.
@@ -26,7 +26,8 @@ Die vollständige Anleitung steht in der Tagesplanung von Tag 16, Abschnitt
 |---------|------|--------|----------|
 | **P0** Setup | – | jede Person | Repository im Codespace, Nimbus-Board der Gruppe offen |
 | **P1** Streitfälle entscheiden | 10 Min | Gruppe | Entscheid und Begründung auf dem Nimbus-Board |
-| **P2** Rechenkern `dora.py` | 25 Min | jede Person im eigenen Repository, die Gruppe hilft sich | `dora.py`, alle Tests grün |
+| **P2a** Eine Woche nachrechnen | 10 Min | jede Person, die Gruppe hilft sich | Werte in `DOKUMENTATION.md` |
+| **P2b** Rohdaten aufbereiten | 15 Min | jede Person, die Gruppe hilft sich | `data/team-shop.csv`, Werte und Stufen in `DOKUMENTATION.md` |
 | **P3** Zwei Teams vergleichen (für Schnelle) | – | jede Person | Vergleich in `DOKUMENTATION.md` |
 
 ### P0 — Setup
@@ -45,30 +46,72 @@ als Fehler, als Lead Time? Lest jeden Fall, entscheidet mit **Ja** oder
 euch auf die Definitionen aus Theorie 1. Das Board bleibt stehen: Im Projekt
 nutzt ihr die Entscheidungen für die Definitionen in `DORA.md`.
 
-### P2 — Rechenkern `dora.py`
+### P2a — Eine Woche nachrechnen (10 Min)
 
-1. Lies den Kopf von `dora.py`: Er beschreibt das Protokoll-Format. Einlesen,
-   `hours()` und `period_days()` sind schon fertig.
-2. Ersetze in den sechs Funktionen `deployment_frequency`, `lead_time_hours`,
-   `change_failure_rate`, `recovery_time_hours`, `rework_rate` und `classify`
-   jedes `raise NotImplementedError` durch deinen Code.
-3. Teste nach jeder Funktion:
+Wer einem Werkzeug vertraut, sollte einmal nachgerechnet haben, was es tut.
+
+1. Öffne `data/woche.csv`: sieben Deployments in einer Woche, eine Zeile pro
+   Deployment. Das Format steht im Kopf von `dora.py`.
+2. Rechne die fünf Metriken von Hand, mit dem Taschenrechner oder einer
+   Tabellenkalkulation aus (Messzeitraum: 7 Tage):
+
+   | Metrik | So rechnest du |
+   |--------|----------------|
+   | Deployment Frequency | Anzahl Deployments ÷ Tage |
+   | Lead Time for Changes | Median von `deployed_at − committed_at` in Stunden |
+   | Change Failure Rate | Anteil der Deployments mit `failed = ja` |
+   | Failed Deployment Recovery Time | Median von `restored_at − deployed_at`, **nur** über die Deployments mit `failed = ja` |
+   | Rework Rate | Anteil der Deployments mit `rework = ja` |
+
+3. Trage deine Werte in `DOKUMENTATION.md` unter **P2a** in die Spalte
+   **Von Hand** ein, z.B. `4 h` oder `2/7`.
+4. Lass das Werkzeug rechnen und vergleiche:
 
    ```bash
-   python -m unittest -v test_dora.TestLeadTime
-   python -m unittest -v          # alle Tests
+   python dora.py data/woche.csv --tage 7
    ```
 
-4. Verändere `test_dora.py` nicht. Die Bewertung prüft, dass die Datei der
-   Vorlage entspricht.
-5. Wenn alle Tests grün sind, rechne ein Protokoll durch:
+5. Beantworte die Frage zu Median und Durchschnitt.
+
+### P2b — Rohdaten aufbereiten (15 Min)
+
+`data/rohdaten.csv` ist ein Export aus der Pipeline von zwei Wochen. Er
+enthält mehr, als gezählt werden darf, und nicht alles ist richtig markiert.
+Die Spalte `notiz` sagt, was passiert ist.
+
+1. Kopiere die Datei und öffne die Kopie im Editor:
 
    ```bash
-   python dora.py data/team-kasse.csv --tage 28
+   cp data/rohdaten.csv data/team-shop.csv
    ```
 
-Nach dem Spiel «Release Rush» könnt ihr das exportierte Spielprotokoll aus
-Nimbus mit demselben Befehl durchrechnen: Es hat dasselbe Format.
+2. Bereinige `data/team-shop.csv` nach der **Kursdefinition** (vergleicht sie
+   mit euren Entscheiden auf dem Nimbus-Board):
+
+   | Fall in den Rohdaten | Regel | Streitfall |
+   |----------------------|-------|------------|
+   | `umgebung = staging` | Zeile löschen: Gezählt wird nur Produktion | 3 |
+   | Feature Flag im Admin-Panel, kein Pipeline-Lauf | Zeile löschen: Ein Deployment ist ein erfolgreicher Lauf der Pipeline in Produktion | 2 |
+   | Automatischer Rollback | `failed = ja`, `restored_at` = Zeitpunkt des Rollbacks | 1 |
+   | Ausfall ohne eigene Änderung (z.B. AWS) | `failed = nein`, `restored_at` leeren | 4 |
+   | Beginn der Lead Time | Spalte `first_commit_at` in `committed_at` umbenennen, nicht `merged_at` | 5 |
+
+   Die Spalten `merged_at`, `umgebung` und `notiz` dürfen stehen bleiben,
+   `dora.py` ignoriert sie. Zeitpunkte schreibst du wie in der Datei, z.B.
+   `2026-11-11T10:03:00Z`.
+
+3. Lass das Werkzeug rechnen:
+
+   ```bash
+   python dora.py data/team-shop.csv --tage 14
+   ```
+
+4. Trage Werte und Stufen in `DOKUMENTATION.md` unter **P2b** ein und
+   beantworte die Frage, was das Aufbereiten verändert hat. Tipp: Lass
+   `dora.py` zum Vergleich auch einmal auf die unbereinigte Kopie laufen.
+
+Habt ihr im Spiel «Release Rush» das Spielprotokoll aus Nimbus exportiert,
+rechnet ihr es mit demselben Befehl durch: `python dora.py <export>.csv --tage 42`.
 
 ### P3 — Zwei Teams vergleichen (für Schnelle)
 
@@ -87,13 +130,13 @@ nichts von Hand pflegen, beim nächsten Push wird die Liste überschrieben.
 **Fortschritt: 0 / 7 Kriterien erfüllt** ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ — Stand: 2026-11-22 16:54 UTC.
 <!-- /c50:progress -->
 
-- [ ] ⬜ P2: Deployment Frequency korrekt berechnet
-- [ ] ⬜ P2: Lead Time for Changes korrekt berechnet (Median in Stunden)
-- [ ] ⬜ P2: Change Failure Rate korrekt berechnet
-- [ ] ⬜ P2: Failed Deployment Recovery Time korrekt berechnet
-- [ ] ⬜ P2: Rework Rate korrekt berechnet
-- [ ] ⬜ P2: Einordnung nach der Kursskala korrekt
-- [ ] ⬜ P2: Alle Tests grün, test_dora.py unverändert
+- [ ] ⬜ P2a: Deployment Frequency und Lead Time nachgerechnet
+- [ ] ⬜ P2a: Change Failure Rate und Rework Rate nachgerechnet
+- [ ] ⬜ P2a: Recovery Time nachgerechnet (Median nur über fehlgeschlagene Deployments)
+- [ ] ⬜ P2b: team-shop.csv enthält nur Produktions-Deployments aus der Pipeline
+- [ ] ⬜ P2b: team-shop.csv misst die Lead Time ab dem ersten Commit
+- [ ] ⬜ P2b: team-shop.csv markiert Fehler nach der Kursdefinition
+- [ ] ⬜ P2b: Messwerte und Stufen in DOKUMENTATION.md eingetragen
 
 Zusätzlich, nicht bewertet:
 

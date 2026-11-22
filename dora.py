@@ -1,7 +1,10 @@
 """DORA-Metriken aus einem Deployment-Protokoll berechnen.
 
+Ein fertiges Werkzeug: Ihr müsst hier nichts programmieren. Eure Arbeit ist,
+die Daten richtig aufzubereiten, das Ergebnis nachzuprüfen und einzuordnen.
+
 Aufruf:
-    python dora.py data/team-kasse.csv
+    python dora.py data/woche.csv --tage 7
     python dora.py data/team-kasse.csv --tage 28
 
 Das Protokoll ist eine CSV-Datei mit einer Zeile pro Deployment in Produktion:
@@ -12,8 +15,9 @@ Das Protokoll ist eine CSV-Datei mit einer Zeile pro Deployment in Produktion:
     restored_at    Zeitpunkt, an dem der Shop wieder normal lief (nur bei failed = ja)
     rework         ja, wenn das Deployment ungeplant war, ausgelöst durch einen Vorfall
 
-Dasselbe Format nutzen das Spielprotokoll aus Nimbus und im Projekt
-scripts/dora_collect.py. Darum funktioniert dieser Rechenkern für alle drei.
+Weitere Spalten (z.B. umgebung oder notiz) stören nicht, dora.py ignoriert
+sie. Dasselbe Format nutzen das Spielprotokoll aus Nimbus und im Projekt
+scripts/dora_collect.py. Darum funktioniert dieses Werkzeug für alle drei.
 """
 
 import argparse
@@ -25,7 +29,7 @@ STUFEN = ("Elite", "Hoch", "Mittel", "Niedrig")
 
 
 # ---------------------------------------------------------------------------
-# Gegeben: Protokoll einlesen und Hilfsfunktionen
+# Protokoll einlesen und Hilfsfunktionen
 # ---------------------------------------------------------------------------
 
 def parse_time(text):
@@ -72,22 +76,25 @@ def period_days(deployments):
 
 
 # ---------------------------------------------------------------------------
-# Ab hier seid ihr dran (P2). Ersetzt jedes «raise NotImplementedError».
-# Die Tests in test_dora.py zeigen, was jede Funktion liefern muss:
-#     python -m unittest -v
+# Die fünf Metriken und die Einordnung nach der Kursskala
 # ---------------------------------------------------------------------------
 
 def deployment_frequency(deployments, days):
     """Durchsatz: Deployments pro Tag im Messzeitraum von «days» Tagen."""
-    raise NotImplementedError
+    if not deployments or not days:
+        return 0
+    return len(deployments) / days
 
 
 def lead_time_hours(deployments):
     """Durchsatz: Median von (deployed_at - committed_at) in Stunden.
 
-    Ohne Deployments: None.
+    Zeilen ohne committed_at (z.B. ein Feature Flag ohne Commit) zählen
+    nicht mit. Ohne solche Deployments: None.
     """
-    raise NotImplementedError
+    times = [hours(d["deployed_at"] - d["committed_at"])
+             for d in deployments if d["committed_at"]]
+    return statistics.median(times) if times else None
 
 
 def change_failure_rate(deployments):
@@ -95,7 +102,9 @@ def change_failure_rate(deployments):
 
     Ohne Deployments: None.
     """
-    raise NotImplementedError
+    if not deployments:
+        return None
+    return sum(1 for d in deployments if d["failed"]) / len(deployments)
 
 
 def recovery_time_hours(deployments):
@@ -105,7 +114,9 @@ def recovery_time_hours(deployments):
     fehlgeschlagene Deployments, die ein restored_at haben.
     Gibt es keine solchen Deployments: None.
     """
-    raise NotImplementedError
+    times = [hours(d["restored_at"] - d["deployed_at"])
+             for d in deployments if d["failed"] and d["restored_at"]]
+    return statistics.median(times) if times else None
 
 
 def rework_rate(deployments):
@@ -113,7 +124,9 @@ def rework_rate(deployments):
 
     Ohne Deployments: None.
     """
-    raise NotImplementedError
+    if not deployments:
+        return None
+    return sum(1 for d in deployments if d["rework"]) / len(deployments)
 
 
 def classify(metric, value):
@@ -131,11 +144,26 @@ def classify(metric, value):
 
     Alles, was keine dieser Bedingungen erfüllt, ist "Niedrig".
     """
-    raise NotImplementedError
+    if value is None:
+        return "–"
+    if metric == "frequency":
+        limits = (value >= 1, value >= 1 / 7, value >= 1 / 30)
+    elif metric == "lead_time":
+        limits = (value < 24, value < 168, value < 720)
+    elif metric == "change_failure_rate":
+        limits = (value <= 0.05, value <= 0.10, value <= 0.20)
+    elif metric == "recovery":
+        limits = (value < 1, value < 24, value < 168)
+    else:
+        raise ValueError(f"Unbekannte Metrik: {metric}")
+    for stufe, erfuellt in zip(STUFEN, limits):
+        if erfuellt:
+            return stufe
+    return STUFEN[-1]
 
 
 # ---------------------------------------------------------------------------
-# Gegeben: Bericht als Markdown-Tabelle
+# Bericht als Markdown-Tabelle
 # ---------------------------------------------------------------------------
 
 def _fmt(value, unit):
