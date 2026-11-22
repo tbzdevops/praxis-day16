@@ -127,7 +127,7 @@ sobald eine Änderung es wieder bricht, verschwindet der Haken. Du musst hier
 nichts von Hand pflegen, beim nächsten Push wird die Liste überschrieben.
 
 <!-- c50:progress -->
-**Fortschritt: 0 / 7 Kriterien erfüllt** ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ — Stand: 2026-11-22 16:54 UTC.
+**Fortschritt: 0 / 7 Kriterien erfüllt** ⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜ — Stand: 2026-11-22 20:07 UTC.
 <!-- /c50:progress -->
 
 - [ ] ⬜ P2a: Deployment Frequency und Lead Time nachgerechnet
